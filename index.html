@@ -1074,17 +1074,19 @@ padding: 0 4px; /* Less padding */
         }
         
         @media (max-width: 480px) {
-            .nav-bar {
-                padding: 8px 12px;
-                gap: 4px;
-                bottom: 15px;
-            }
+           .nav-bar {
+        padding: 6px 4px; /* Tighter container */
+        gap: 2px; /* Pull buttons closer together */
+        bottom: 10px;
+        width: 95%; /* Prevent it from touching edges */
+    }
             
             .nav-link {
-                font-size: 9px;
-                padding: 8px 10px;
-                letter-spacing: 0.5px;
-            }
+        font-size: 8px !important;  /* Smaller font */
+        padding: 6px 3px !important; /* Very small side padding */
+        letter-spacing: 0px !important; /* Remove spacing to save room */
+        min-width: auto; /* Let it shrink */
+    }
             
             .skills-grid {
                 grid-template-columns: 1fr 1fr;
@@ -1360,6 +1362,10 @@ padding: 0 4px; /* Less padding */
                             <span>📸</span>
                             Personal Gallery
                         </a>
+                        <a href="mailto:mudilivdnsskarthikeyamudili@gmail.com" class="glass-btn">
+    <span class="btn-icon" style="font-size: 1.2rem;">✉️</span>
+    <span class="btn-text">OFFICIAL MAIL</span>
+</a>
                     </div>
                 </div>
             </div>
