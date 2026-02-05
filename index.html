@@ -424,6 +424,13 @@ h1, h2, h3, .glitch {
             letter-spacing: 4px;
             animation: titleFloat 6s ease-in-out infinite;
         }
+        /* MOBILE FIX: KEEPS NAME ON ONE LINE */
+@media (max-width: 768px) {
+    .glitch {
+        font-size: 1.8rem !important; /* Smaller text for phones */
+        white-space: nowrap; /* Forces one line */
+    }
+}
         
         @keyframes titleFloat {
             0%, 100% { transform: translateY(0); }
@@ -1019,8 +1026,10 @@ h1, h2, h3, .glitch {
         <!-- Hero Section -->
         <section class="section" id="home">
             <div class="glass-card hero-content">
-                <h1 class="hero-title">VDNSS Karthikeya Mudili</h1>
-                <p class="hero-subtitle">Bridging GAAP Standards & Python Automation</p>
+<h1 class="hero-title">
+                        <span style="font-size: 0.4em; display: block; color: #ffd700; letter-spacing: 8px; margin-bottom: 10px;">VDNSS</span>
+                        KARTHIKEYA MUDILI
+                    </h1>                <p class="hero-subtitle">Bridging GAAP Standards & Python Automation</p>
                 <p class="hero-tagline">Crafting digital experiences through the flames of creativity. Transforming ideas into immersive worlds.</p>
             </div>
         </section>
