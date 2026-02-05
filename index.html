@@ -1075,17 +1075,18 @@ padding: 0 4px; /* Less padding */
         
         @media (max-width: 480px) {
            .nav-bar {
-        padding: 6px 4px; /* Tighter container */
-        gap: 2px; /* Pull buttons closer together */
-        bottom: 10px;
-        width: 95%; /* Prevent it from touching edges */
+        bottom: 25px !important;  /* Lift it up higher */
+        width: 92% !important;    /* Make it narrower than screen */
+        padding: 8px 2px !important; /* Very tight internal padding */
+        gap: 0px !important;      /* No gap between buttons */
+        justify-content: space-evenly; /* Spread them out evenly */
     }
             
             .nav-link {
-        font-size: 8px !important;  /* Smaller font */
-        padding: 6px 3px !important; /* Very small side padding */
-        letter-spacing: 0px !important; /* Remove spacing to save room */
-        min-width: auto; /* Let it shrink */
+        font-size: 8px !important; /* Small readable text */
+        padding: 5px 4px !important; /* Clickable area */
+        letter-spacing: 0px !important; /* Tighten letters */
+        width: auto !important;
     }
             
             .skills-grid {
@@ -1362,9 +1363,9 @@ padding: 0 4px; /* Less padding */
                             <span>📸</span>
                             Personal Gallery
                         </a>
-                        <a href="mailto:mudilivdnsskarthikeyamudili@gmail.com" class="glass-btn">
-    <span class="btn-icon" style="font-size: 1.2rem;">✉️</span>
-    <span class="btn-text">OFFICIAL MAIL</span>
+                        <a href="mailto:vdnss.karthikeya@gmail.com" class="social-btn linkedin">
+    <span>✉️</span>
+    OFFICIAL MAIL
 </a>
                     </div>
                 </div>
