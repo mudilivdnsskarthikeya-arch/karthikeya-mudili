@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Flame Emperor | Portfolio</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        /* ===== CSS RESET & BASE ===== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            /* Flame Colors */
+            --flame-blue: #0066FF;
+            --flame-red: #FF0040;
+            --flame-green: #00FF80;
+            --flame-violet: #9D4EDD;
+            --flame-gold: #FFD700;
+            
+            /* Base Colors */
+            --bg-black: #000000;
+            --surface-dark: #0A0A0A;
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            
+            /* Animation Timing */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-black);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        /* ===== HIDE SCROLLBAR ===== */
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Hide scrollbar for IE, Edge and Firefox */
+        body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* ===== FLAME PROGRESS BAR ===== */
+        .flame-progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 0%;
+            background: linear-gradient(90deg, 
+                var(--flame-red) 0%, 
+                var(--flame-gold) 25%, 
+                var(--flame-green) 50%, 
+                var(--flame-blue) 75%, 
+                var(--flame-violet) 100%);
+            box-shadow: 
+                0 0 10px var(--flame-red),
+                0 0 20px var(--flame-gold),
+                0 0 30px var(--flame-blue);
+            z-index: 200;
+            transition: width 0.1s ease-out;
+        }
+        
+        .flame-progress-bar::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: var(--flame-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--flame-gold), 0 0 30px var(--flame-red);
+            animation: progressPulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes progressPulse {
+            0%, 100% { 
+                box-shadow: 0 0 15px var(--flame-gold), 0 0 30px var(--flame-red);
+                transform: translateY(-50%) scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 25px var(--flame-gold), 0 0 50px var(--flame-red);
+                transform: translateY(-50%) scale(1.3);
+            }
+        }
+        
+        /* ===== WEBGL BACKGROUND ===== */
+        #fire-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* ===== CUSTOM CURSOR ===== */
+        .cursor {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+        }
+        
+        .cursor-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--flame-gold);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--flame-gold), 0 0 20px var(--flame-gold);
+        }
+        
+        .cursor-hline {
+            position: absolute;
+            width: 15px;
+            height: 1px;
+            background: var(--flame-gold);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 5px var(--flame-gold);
+        }
+        
+        .cursor-vline {
+            position: absolute;
+            width: 1px;
+            height: 15px;
+            background: var(--flame-gold);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 5px var(--flame-gold);
+        }
+        
+        .cursor-outer {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--flame-gold);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.5;
+            animation: cursorPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes cursorPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.3; }
+        }
+        
+        /* ===== INTRO SEQUENCE ===== */
+        #intro-sequence {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        #intro-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .ignite-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+        
+        .ignite-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--flame-gold);
+            background: transparent;
+            border: 2px solid var(--flame-gold);
+            border-radius: 50px;
+            padding: 20px 60px;
+            cursor: none;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px var(--flame-gold);
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.3) inset,
+                0 0 50px rgba(255, 215, 0, 0.5);
+            animation: ignitePulse 2s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+        
+        .ignite-btn:hover {
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 
+                0 0 50px rgba(255, 215, 0, 0.5) inset,
+                0 0 80px rgba(255, 215, 0, 0.8);
+            transform: scale(1.05);
+        }
+        
+        @keyframes ignitePulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 30px rgba(255, 215, 0, 0.3) inset,
+                    0 0 50px rgba(255, 215, 0, 0.5);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 50px rgba(255, 215, 0, 0.5) inset,
+                    0 0 80px rgba(255, 215, 0, 0.8);
+            }
+        }
+        
+        .ignite-subtext {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 20px;
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
+        
+        .shockwave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1001;
+        }
+        
+        /* ===== NAVIGATION - DESKTOP ===== */
+        .nav-bar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 12px 32px;
+            z-index: 100;
+            display: flex;
+            gap: 32px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        .nav-bar.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .nav-link {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 8px 0;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: currentColor;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px currentColor;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-primary);
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link[data-section="home"]:hover { color: var(--flame-gold); }
+        .nav-link[data-section="about"]:hover { color: var(--flame-violet); }
+        .nav-link[data-section="skills"]:hover { color: var(--flame-green); }
+        .nav-link[data-section="path"]:hover { color: var(--flame-blue); }
+        .nav-link[data-section="hobbies"]:hover { color: var(--flame-red); }
+        .nav-link[data-section="contact"]:hover { 
+            animation: colorCycle 2s linear infinite;
+        }
+        
+        @keyframes colorCycle {
+            0% { color: var(--flame-gold); }
+            20% { color: var(--flame-red); }
+            40% { color: var(--flame-green); }
+            60% { color: var(--flame-blue); }
+            80% { color: var(--flame-violet); }
+            100% { color: var(--flame-gold); }
+        }
+        
+        /* ===== SECTIONS ===== */
+        .section {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            padding: 80px 24px;
+        }
+        
+        /* ===== GLASS CARD ===== */
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            max-width: 1000px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .glass-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.8s var(--ease-out-expo);
+        }
+        
+        /* ===== HERO SECTION ===== */
+        .hero-content {
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(48px, 10vw, 96px);
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD700, #FF6B35, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 60px rgba(255, 215, 0, 0.5);
+            margin-bottom: 16px;
+            letter-spacing: 4px;
+            animation: titleFloat 6s ease-in-out infinite;
+        }
+        
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .hero-subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(18px, 3vw, 28px);
+            font-weight: 500;
+            color: var(--flame-red);
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            text-shadow: 0 0 30px rgba(255, 0, 64, 0.8);
+            margin-bottom: 24px;
+        }
+        
+        .hero-tagline {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* ===== ABOUT SECTION ===== */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+        }
+        
+        .about-title {
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            font-weight: 600;
+            color: var(--flame-violet);
+            text-shadow: 0 0 30px rgba(157, 78, 221, 0.5);
+            margin-bottom: 24px;
+        }
+        
+        .about-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+        
+        .about-text p {
+            margin-bottom: 16px;
+        }
+        
+        .orb-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #flame-orb {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* ===== SKILLS SECTION ===== */
+        .skills-title {
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            font-weight: 600;
+            color: var(--flame-green);
+            text-shadow: 0 0 30px rgba(0, 255, 128, 0.5);
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+        
+        .soul-stone {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 0 auto;
+            cursor: none;
+            transition: all 0.3s ease;
+        }
+        
+        .soul-stone::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--stone-color), transparent 70%);
+            opacity: 0.3;
+        }
+        
+        .soul-stone::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            border: 2px solid var(--stone-color);
+            box-shadow: 0 0 20px var(--stone-color), 0 0 40px var(--stone-color) inset;
+        }
+        
+        .soul-stone:hover {
+            transform: scale(1.15);
+        }
+        
+        .soul-stone:hover::before {
+            opacity: 0.6;
+        }
+        
+        .soul-stone:hover::after {
+            box-shadow: 0 0 40px var(--stone-color), 0 0 60px var(--stone-color) inset;
+        }
+        
+        .stone-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .stone-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+        
+        /* ===== TIMELINE SECTION ===== */
+        .timeline-title {
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            font-weight: 600;
+            color: var(--flame-blue);
+            text-shadow: 0 0 30px rgba(0, 102, 255, 0.5);
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, 
+                var(--flame-blue) 0%, 
+                var(--flame-violet) 50%, 
+                var(--flame-red) 100%);
+            border-radius: 2px;
+            box-shadow: 0 0 20px var(--flame-blue);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding: 24px 0;
+            padding-left: 32px;
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 0.6s var(--ease-out-expo);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -44px;
+            top: 28px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--flame-blue);
+            border: 3px solid #000;
+            box-shadow: 0 0 15px var(--flame-blue);
+        }
+        
+        .timeline-date {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: var(--flame-blue);
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+        
+        .timeline-role {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .timeline-company {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* ===== HOBBIES SECTION ===== */
+        .hobbies-title {
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            font-weight: 600;
+            color: var(--flame-red);
+            text-shadow: 0 0 30px rgba(255, 0, 64, 0.5);
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .hobbies-slider {
+            display: flex;
+            gap: 24px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding: 20px 0;
+            scrollbar-width: none;
+        }
+        
+        .hobbies-slider::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .hobby-card {
+            flex: 0 0 280px;
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            scroll-snap-align: start;
+            transition: all 0.3s ease;
+            cursor: none;
+        }
+        
+        .hobby-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--flame-red);
+            box-shadow: 0 10px 40px rgba(255, 0, 64, 0.3);
+        }
+        
+        .hobby-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .hobby-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .hobby-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* ===== CONTACT SECTION ===== */
+        .contact-title {
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--flame-gold), var(--flame-red), var(--flame-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        
+        .contact-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .contact-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-input:focus {
+            border-color: var(--flame-gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        textarea.form-input {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .fire-seal-btn {
+            width: 100%;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--flame-gold);
+            background: transparent;
+            border: 2px solid var(--flame-gold);
+            border-radius: 50px;
+            padding: 18px;
+            cursor: none;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px var(--flame-gold);
+            box-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.2) inset,
+                0 0 30px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fire-seal-btn:hover {
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 
+                0 0 40px rgba(255, 215, 0, 0.4) inset,
+                0 0 60px rgba(255, 215, 0, 0.5);
+        }
+        
+        .fire-seal-btn.burning {
+            animation: burnAway 1s ease forwards;
+        }
+        
+        @keyframes burnAway {
+            0% { 
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0);
+            }
+            50% {
+                opacity: 0.5;
+                filter: blur(5px);
+            }
+            100% { 
+                opacity: 0;
+                transform: scale(1.2);
+                filter: blur(20px);
+            }
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 48px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .success-message.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+        
+        .success-text {
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            color: var(--flame-gold);
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            margin-bottom: 16px;
+        }
+        
+        .success-subtext {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        /* ===== PARTICLE EXPLOSION ===== */
+        .particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9998;
+        }
+        
+        /* ===== RESPONSIVE - TABLET ===== */
+        @media (max-width: 1024px) {
+            .skills-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            #flame-orb {
+                width: 200px;
+                height: 200px;
+            }
+        }
+        
+        /* ===== RESPONSIVE - MOBILE (Bottom Dock Navigation) ===== */
+        @media (max-width: 768px) {
+            /* Move nav to bottom as floating glass dock */
+            .nav-bar {
+                top: auto;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                gap: 8px;
+                padding: 10px 16px;
+                border-radius: 30px;
+                background: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(25px);
+                -webkit-backdrop-filter: blur(25px);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 
+                    0 10px 40px rgba(0, 0, 0, 0.5),
+                    0 0 20px rgba(255, 100, 0, 0.1);
+            }
+            
+            .nav-link {
+                font-size: 10px;
+                letter-spacing: 1px;
+                padding: 10px 12px;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+            }
+            
+            .nav-link::after {
+                display: none;
+            }
+            
+            .nav-link:hover,
+            .nav-link:active {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            /* Adjust section padding for bottom dock */
+            .section {
+                padding: 60px 20px 100px 20px;
+            }
+            
+            .skills-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .soul-stone {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .glass-card {
+                padding: 32px 24px;
+            }
+            
+            body {
+                cursor: auto;
+            }
+            
+            .cursor {
+                display: none;
+            }
+            
+            /* Adjust progress bar for mobile */
+            .flame-progress-bar {
+                height: 2px;
+                bottom: 80px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-bar {
+                padding: 8px 12px;
+                gap: 4px;
+                bottom: 15px;
+            }
+            
+            .nav-link {
+                font-size: 9px;
+                padding: 8px 10px;
+                letter-spacing: 0.5px;
+            }
+            
+            .skills-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .hero-title {
+                font-size: 36px;
+            }
+            
+            .hero-subtitle {
+                font-size: 14px;
+            }
+            
+            .section {
+                padding: 50px 16px 90px 16px;
+            }
+            
+            .flame-progress-bar {
+                bottom: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Flame Progress Bar -->
+    <div class="flame-progress-bar" id="flame-progress-bar"></div>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor">
+        <div class="cursor-outer"></div>
+        <div class="cursor-hline"></div>
+        <div class="cursor-vline"></div>
+        <div class="cursor-dot"></div>
+    </div>
+    
+    <!-- Particle Canvas for Click Explosions -->
+    <canvas class="particle-canvas" id="particle-canvas"></canvas>
+    
+    <!-- WebGL Fire Background -->
+    <canvas id="fire-canvas"></canvas>
+    
+    <!-- Intro Sequence -->
+    <div id="intro-sequence">
+        <canvas id="intro-canvas"></canvas>
+        <div class="ignite-container">
+            <button class="ignite-btn" id="ignite-btn">IGNITE</button>
+            <p class="ignite-subtext">Click to awaken the flames</p>
+        </div>
+        <div class="shockwave" id="shockwave"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="nav-bar" id="nav-bar">
+        <a href="#home" class="nav-link" data-section="home">Home</a>
+        <a href="#about" class="nav-link" data-section="about">Who Am I</a>
+        <a href="#skills" class="nav-link" data-section="skills">Skills</a>
+        <a href="#path" class="nav-link" data-section="path">Path</a>
+        <a href="#hobbies" class="nav-link" data-section="hobbies">Hobbies</a>
+        <a href="#contact" class="nav-link" data-section="contact">Contact</a>
+    </nav>
+    
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section class="section" id="home">
+            <div class="glass-card hero-content">
+                <h1 class="hero-title">The Alchemist</h1>
+                <p class="hero-subtitle">Forged in Fire</p>
+                <p class="hero-tagline">Crafting digital experiences through the flames of creativity. Transforming ideas into immersive worlds.</p>
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section class="section" id="about">
+            <div class="glass-card">
+                <div class="about-grid">
+                    <div class="about-text-content">
+                        <h2 class="about-title">Who Am I</h2>
+                        <div class="about-text">
+                            <p>A creative developer and designer, forged in the fires of countless projects. Like an alchemist transmuting base metals into gold, I transform ideas into immersive digital experiences.</p>
+                            <p>My journey began with a spark of curiosity and has grown into an eternal flame of passion for creating beautiful, functional, and memorable web experiences.</p>
+                            <p>With expertise spanning frontend development, 3D graphics, and interactive design, I bring a unique perspective to every project—one that's been tempered by challenges and refined by experience.</p>
+                        </div>
+                    </div>
+                    <div class="orb-container">
+                        <canvas id="flame-orb"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Skills Section -->
+        <section class="section" id="skills">
+            <div class="glass-card">
+                <h2 class="skills-title">The Arsenal</h2>
+                <div class="skills-grid">
+                    <div class="soul-stone" data-color="#FFD700">
+                        <span class="stone-icon">⚡</span>
+                        <span class="stone-name">JavaScript</span>
+                    </div>
+                    <div class="soul-stone" data-color="#0066FF">
+                        <span class="stone-icon">⚛️</span>
+                        <span class="stone-name">React</span>
+                    </div>
+                    <div class="soul-stone" data-color="#9D4EDD">
+                        <span class="stone-icon">🔷</span>
+                        <span class="stone-name">Three.js</span>
+                    </div>
+                    <div class="soul-stone" data-color="#00FF80">
+                        <span class="stone-icon">🎨</span>
+                        <span class="stone-name">CSS/Tailwind</span>
+                    </div>
+                    <div class="soul-stone" data-color="#FF0040">
+                        <span class="stone-icon">🟢</span>
+                        <span class="stone-name">Node.js</span>
+                    </div>
+                    <div class="soul-stone" data-color="#0066FF">
+                        <span class="stone-icon">🐍</span>
+                        <span class="stone-name">Python</span>
+                    </div>
+                    <div class="soul-stone" data-color="#9D4EDD">
+                        <span class="stone-icon">🌐</span>
+                        <span class="stone-name">WebGL</span>
+                    </div>
+                    <div class="soul-stone" data-color="#FFD700">
+                        <span class="stone-icon">✨</span>
+                        <span class="stone-name">UI/UX Design</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Timeline Section -->
+        <section class="section" id="path">
+            <div class="glass-card">
+                <h2 class="timeline-title">The Path</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">2024</div>
+                        <div class="timeline-role">Senior Creative Developer</div>
+                        <div class="timeline-company">Flame Studios</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2022</div>
+                        <div class="timeline-role">Full Stack Developer</div>
+                        <div class="timeline-company">Ember Tech</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2020</div>
+                        <div class="timeline-role">Frontend Developer</div>
+                        <div class="timeline-company">Spark Digital</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2019</div>
+                        <div class="timeline-role">BS Computer Science</div>
+                        <div class="timeline-company">University of Fire</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2018</div>
+                        <div class="timeline-role">Web Design Certification</div>
+                        <div class="timeline-company">Inferno Academy</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Hobbies Section -->
+        <section class="section" id="hobbies">
+            <div class="glass-card">
+                <h2 class="hobbies-title">Passions</h2>
+                <div class="hobbies-slider">
+                    <div class="hobby-card">
+                        <div class="hobby-icon">🎭</div>
+                        <h3 class="hobby-name">3D Modeling</h3>
+                        <p class="hobby-desc">Creating digital sculptures and immersive environments that push the boundaries of imagination.</p>
+                    </div>
+                    <div class="hobby-card">
+                        <div class="hobby-icon">🎮</div>
+                        <h3 class="hobby-name">Game Dev</h3>
+                        <p class="hobby-desc">Building interactive worlds where players can lose themselves in epic adventures.</p>
+                    </div>
+                    <div class="hobby-card">
+                        <div class="hobby-icon">📷</div>
+                        <h3 class="hobby-name">Photography</h3>
+                        <p class="hobby-desc">Capturing fleeting moments and eternalizing them through the lens.</p>
+                    </div>
+                    <div class="hobby-card">
+                        <div class="hobby-icon">🎵</div>
+                        <h3 class="hobby-name">Music</h3>
+                        <p class="hobby-desc">Composing electronic soundscapes that evoke emotion and atmosphere.</p>
+                    </div>
+                    <div class="hobby-card">
+                        <div class="hobby-icon">📚</div>
+                        <h3 class="hobby-name">Reading</h3>
+                        <p class="hobby-desc">Exploring fantasy and sci-fi realms, gathering inspiration from great storytellers.</p>
+                    </div>
+                    <div class="hobby-card">
+                        <div class="hobby-icon">🥋</div>
+                        <h3 class="hobby-name">Martial Arts</h3>
+                        <p class="hobby-desc">Discipline of body and mind, finding balance through physical training.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section class="section" id="contact">
+            <div class="glass-card">
+                <h2 class="contact-title">Summon Me</h2>
+                <p class="contact-subtitle">Send a message through the flames</p>
+                
+                <form class="contact-form" id="contact-form">
+                    <div class="form-group">
+                        <label class="form-label">Your Name</label>
+                        <input type="text" class="form-input" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Your Email</label>
+                        <input type="email" class="form-input" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Your Message</label>
+                        <textarea class="form-input" placeholder="Speak through the flames..." required></textarea>
+                    </div>
+                    <button type="submit" class="fire-seal-btn" id="submit-btn">INVOKE</button>
+                </form>
+                
+                <div class="success-message" id="success-message">
+                    <h3 class="success-text">Message Sent!</h3>
+                    <p class="success-subtext">The flames have carried your words. I shall respond soon.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ===== FLAME EMPEROR PORTFOLIO - MAIN SCRIPT =====
+        
+        // Register GSAP plugins
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // ===== COLOR PALETTE =====
+        const FLAME_COLORS = {
+            blue: 0x0066FF,
+            red: 0xFF0040,
+            green: 0x00FF80,
+            violet: 0x9D4EDD,
+            gold: 0xFFD700
+        };
+        
+        const FLAME_COLORS_CSS = {
+            blue: '#0066FF',
+            red: '#FF0040',
+            green: '#00FF80',
+            violet: '#9D4EDD',
+            gold: '#FFD700'
+        };
+        
+        // ===== STATE =====
+        let introComplete = false;
+        let mouseX = 0;
+        let mouseY = 0;
+        let currentFlameIndex = 0;
+        
+        // ===== FLAME PROGRESS BAR =====
+        const flameProgressBar = document.getElementById('flame-progress-bar');
+        
+        function updateProgressBar() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            flameProgressBar.style.width = scrollPercent + '%';
+        }
+        
+        window.addEventListener('scroll', updateProgressBar, { passive: true });
+        
+        // ===== CUSTOM CURSOR =====
+        const cursor = document.getElementById('cursor');
+        const cursorDot = cursor.querySelector('.cursor-dot');
+        const cursorOuter = cursor.querySelector('.cursor-outer');
+        const cursorHLine = cursor.querySelector('.cursor-hline');
+        const cursorVLine = cursor.querySelector('.cursor-vline');
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+        });
+        
+        // Cycle cursor color
+        setInterval(() => {
+            const colors = Object.values(FLAME_COLORS_CSS);
+            currentFlameIndex = (currentFlameIndex + 1) % colors.length;
+            const color = colors[currentFlameIndex];
+            
+            cursorDot.style.background = color;
+            cursorDot.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
+            cursorOuter.style.borderColor = color;
+            cursorHLine.style.background = color;
+            cursorHLine.style.boxShadow = `0 0 5px ${color}`;
+            cursorVLine.style.background = color;
+            cursorVLine.style.boxShadow = `0 0 5px ${color}`;
+        }, 2000);
+        
+        // ===== PARTICLE EXPLOSION SYSTEM =====
+        const particleCanvas = document.getElementById('particle-canvas');
+        const particleCtx = particleCanvas.getContext('2d');
+        particleCanvas.width = window.innerWidth;
+        particleCanvas.height = window.innerHeight;
+        
+        let particles = [];
+        
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 5 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.life = 1;
+                this.decay = Math.random() * 0.02 + 0.01;
+                this.size = Math.random() * 4 + 2;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.1;
+                this.vx *= 0.98;
+                this.vy *= 0.98;
+                this.life -= this.decay;
+                this.size *= 0.98;
+            }
+            
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        
+        function createExplosion(x, y) {
+            const colors = Object.values(FLAME_COLORS_CSS);
+            for (let i = 0; i < 40; i++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particles.push(new Particle(x, y, color));
+            }
+        }
+        
+        function animateParticles() {
+            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            
+            particles = particles.filter(p => p.life > 0);
+            particles.forEach(p => {
+                p.update();
+                p.draw(particleCtx);
+            });
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        animateParticles();
+        
+        document.addEventListener('click', (e) => {
+            if (!introComplete) return;
+            createExplosion(e.clientX, e.clientY);
+        });
+        
+        window.addEventListener('resize', () => {
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+        });
+        
+        // ===== WEBGL FIRE BACKGROUND =====
+        const fireCanvas = document.getElementById('fire-canvas');
+        const fireScene = new THREE.Scene();
+        const fireCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        const fireRenderer = new THREE.WebGLRenderer({ 
+            canvas: fireCanvas, 
+            alpha: true,
+            antialias: false
+        });
+        fireRenderer.setSize(window.innerWidth, window.innerHeight);
+        fireRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        const fireVertexShader = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 1.0);
+            }
+        `;
+        
+        const fireFragmentShader = `
+            uniform float uTime;
+            uniform vec2 uMouse;
+            uniform vec2 uResolution;
+            varying vec2 vUv;
+            
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+            
+            float snoise(vec2 v) {
+                const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                                   -0.577350269189626, 0.024390243902439);
+                vec2 i  = floor(v + dot(v, C.yy));
+                vec2 x0 = v - i + dot(i, C.xx);
+                vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                vec4 x12 = x0.xyxy + C.xxzz;
+                x12.xy -= i1;
+                i = mod289(i);
+                vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
+                                       + i.x + vec3(0.0, i1.x, 1.0));
+                vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+                                       dot(x12.zw,x12.zw)), 0.0);
+                m = m*m; m = m*m;
+                vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                vec3 h = abs(x) - 0.5;
+                vec3 ox = floor(x + 0.5);
+                vec3 a0 = x - ox;
+                m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+                vec3 g;
+                g.x = a0.x * x0.x + h.x * x0.y;
+                g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                return 130.0 * dot(m, g);
+            }
+            
+            float fbm(vec2 p) {
+                float value = 0.0;
+                float amplitude = 0.5;
+                float frequency = 1.0;
+                for (int i = 0; i < 5; i++) {
+                    value += amplitude * snoise(p * frequency);
+                    amplitude *= 0.5;
+                    frequency *= 2.0;
+                }
+                return value;
+            }
+            
+            void main() {
+                vec2 uv = vUv;
+                vec2 mouse = uMouse / uResolution;
+                
+                float time = uTime * 0.3;
+                
+                float mouseDist = distance(uv, mouse);
+                float mouseInfluence = smoothstep(0.3, 0.0, mouseDist) * 0.5;
+                
+                vec2 q = vec2(0.0);
+                q.x = fbm(uv * 3.0 + vec2(0.0, time));
+                q.y = fbm(uv * 3.0 + vec2(1.0, time));
+                
+                vec2 r = vec2(0.0);
+                r.x = fbm(uv * 3.0 + q + vec2(1.7, 9.2) + 0.15 * time + mouseInfluence);
+                r.y = fbm(uv * 3.0 + q + vec2(8.3, 2.8) + 0.126 * time);
+                
+                float f = fbm(uv * 3.0 + r + vec2(time * 0.1, -time * 0.2));
+                
+                float height = uv.y + f * 0.3;
+                
+                vec3 color1 = vec3(1.0, 0.0, 0.25);
+                vec3 color2 = vec3(1.0, 0.4, 0.0);
+                vec3 color3 = vec3(1.0, 0.84, 0.0);
+                vec3 color4 = vec3(0.0, 0.4, 1.0);
+                vec3 color5 = vec3(0.62, 0.31, 0.87);
+                vec3 color6 = vec3(0.0, 1.0, 0.5);
+                
+                vec3 fireColor = mix(color1, color2, smoothstep(0.0, 0.3, height));
+                fireColor = mix(fireColor, color3, smoothstep(0.3, 0.6, height));
+                fireColor = mix(fireColor, color4, smoothstep(0.6, 0.8, height) * (0.5 + 0.5 * sin(time)));
+                fireColor = mix(fireColor, color5, smoothstep(0.4, 0.7, f) * 0.5);
+                fireColor = mix(fireColor, color6, smoothstep(0.2, 0.5, r.x) * 0.3);
+                
+                float brightness = smoothstep(-0.5, 1.5, f);
+                fireColor *= 0.5 + brightness * 0.8;
+                
+                fireColor += vec3(0.3, 0.5, 1.0) * mouseInfluence;
+                
+                float vignette = 1.0 - smoothstep(0.3, 1.0, length(uv - 0.5));
+                fireColor *= 0.3 + vignette * 0.7;
+                
+                gl_FragColor = vec4(fireColor, 1.0);
+            }
+        `;
+        
+        const fireUniforms = {
+            uTime: { value: 0 },
+            uMouse: { value: new THREE.Vector2(0, 0) },
+            uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+        };
+        
+        const fireMaterial = new THREE.ShaderMaterial({
+            vertexShader: fireVertexShader,
+            fragmentShader: fireFragmentShader,
+            uniforms: fireUniforms
+        });
+        
+        const firePlane = new THREE.Mesh(
+            new THREE.PlaneGeometry(2, 2),
+            fireMaterial
+        );
+        fireScene.add(firePlane);
+        
+        document.addEventListener('mousemove', (e) => {
+            fireUniforms.uMouse.value.set(e.clientX, window.innerHeight - e.clientY);
+        });
+        
+        function animateFire() {
+            if (introComplete) {
+                fireUniforms.uTime.value += 0.016;
+                fireRenderer.render(fireScene, fireCamera);
+            }
+            requestAnimationFrame(animateFire);
+        }
+        animateFire();
+        
+        window.addEventListener('resize', () => {
+            fireRenderer.setSize(window.innerWidth, window.innerHeight);
+            fireUniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+        });
+        
+        // ===== INTRO SEQUENCE =====
+        const introCanvas = document.getElementById('intro-canvas');
+        const introScene = new THREE.Scene();
+        const introCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const introRenderer = new THREE.WebGLRenderer({ 
+            canvas: introCanvas, 
+            alpha: true,
+            antialias: true
+        });
+        introRenderer.setSize(window.innerWidth, window.innerHeight);
+        introRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        introCamera.position.z = 5;
+        
+        const flameOrbs = [];
+        const flameColorsArray = [
+            FLAME_COLORS.blue,
+            FLAME_COLORS.red,
+            FLAME_COLORS.green,
+            FLAME_COLORS.violet,
+            FLAME_COLORS.gold
+        ];
+        
+        const flamePositions = [
+            { x: -3, y: 2, z: 0 },
+            { x: 3, y: 2, z: 0 },
+            { x: -3, y: -2, z: 0 },
+            { x: 3, y: -2, z: 0 },
+            { x: 0, y: -3, z: 0 }
+        ];
+        
+        function createParticleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32;
+            canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            
+            const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.5)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 32, 32);
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+        
+        const particleTexture = createParticleTexture();
+        
+        flameColorsArray.forEach((color, index) => {
+            const particleCount = 200;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const velocities = new Float32Array(particleCount * 3);
+            const sizes = new Float32Array(particleCount);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.random() * 0.5;
+                
+                positions[i3] = Math.cos(angle) * radius;
+                positions[i3 + 1] = Math.sin(angle) * radius;
+                positions[i3 + 2] = (Math.random() - 0.5) * 0.5;
+                
+                velocities[i3] = (Math.random() - 0.5) * 0.02;
+                velocities[i3 + 1] = (Math.random() - 0.5) * 0.02;
+                velocities[i3 + 2] = (Math.random() - 0.5) * 0.02;
+                
+                sizes[i] = Math.random() * 0.1 + 0.05;
+            }
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            
+            const material = new THREE.PointsMaterial({
+                color: color,
+                size: 0.15,
+                map: particleTexture,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+            
+            const orb = new THREE.Points(geometry, material);
+            orb.position.set(flamePositions[index].x, flamePositions[index].y, flamePositions[index].z);
+            
+            introScene.add(orb);
+            flameOrbs.push({
+                mesh: orb,
+                originalPos: flamePositions[index],
+                color: color,
+                angle: (index / 5) * Math.PI * 2,
+                speed: 0.5 + Math.random() * 0.5
+            });
+        });
+        
+        const centerGlowGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const centerGlowMaterial = new THREE.MeshBasicMaterial({
+            color: FLAME_COLORS.gold,
+            transparent: true,
+            opacity: 0.3
+        });
+        const centerGlow = new THREE.Mesh(centerGlowGeometry, centerGlowMaterial);
+        introScene.add(centerGlow);
+        
+        let introTime = 0;
+        let isColliding = false;
+        
+        function animateIntro() {
+            if (introComplete) return;
+            
+            introTime += 0.016;
+            
+            if (!isColliding) {
+                flameOrbs.forEach((orb, index) => {
+                    const spiralRadius = Math.max(0.1, 3 - introTime * 0.3);
+                    const angle = orb.angle + introTime * orb.speed;
+                    
+                    orb.mesh.position.x = Math.cos(angle) * spiralRadius;
+                    orb.mesh.position.y = Math.sin(angle) * spiralRadius + Math.sin(introTime * 2 + index) * 0.2;
+                    
+                    orb.mesh.rotation.z += 0.02;
+                    orb.mesh.rotation.y += 0.01;
+                    
+                    const scale = 1 + Math.sin(introTime * 3 + index) * 0.2;
+                    orb.mesh.scale.setScalar(scale);
+                });
+                
+                centerGlow.scale.setScalar(1 + Math.sin(introTime * 4) * 0.3);
+                centerGlowMaterial.opacity = 0.2 + Math.sin(introTime * 3) * 0.1;
+            }
+            
+            introRenderer.render(introScene, introCamera);
+            requestAnimationFrame(animateIntro);
+        }
+        
+        animateIntro();
+        
+        document.getElementById('ignite-btn').addEventListener('click', () => {
+            if (isColliding) return;
+            isColliding = true;
+            
+            document.body.style.animation = 'shake 0.5s ease';
+            
+            const tl = gsap.timeline();
+            
+            flameOrbs.forEach((orb, index) => {
+                tl.to(orb.mesh.position, {
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                    duration: 0.5,
+                    ease: 'power2.in'
+                }, 0);
+                
+                tl.to(orb.mesh.scale, {
+                    x: 3,
+                    y: 3,
+                    z: 3,
+                    duration: 0.5,
+                    ease: 'power2.in'
+                }, 0);
+            });
+            
+            tl.to(centerGlowMaterial, {
+                opacity: 1,
+                duration: 0.2
+            }, 0.3);
+            
+            tl.add(() => {
+                const shockwave = document.getElementById('shockwave');
+                shockwave.style.boxShadow = `
+                    0 0 100px 50px rgba(255, 215, 0, 0.8),
+                    0 0 200px 100px rgba(255, 0, 64, 0.6),
+                    0 0 300px 150px rgba(0, 102, 255, 0.4)
+                `;
+                
+                gsap.to(shockwave, {
+                    width: '300vw',
+                    height: '300vw',
+                    duration: 1,
+                    ease: 'power2.out'
+                });
+            }, 0.5);
+            
+            tl.to('#intro-sequence', {
+                opacity: 0,
+                duration: 0.5,
+                delay: 0.3
+            });
+            
+            tl.add(() => {
+                document.getElementById('intro-sequence').style.display = 'none';
+                introComplete = true;
+                
+                document.getElementById('nav-bar').classList.add('visible');
+                document.querySelector('#home .glass-card').classList.add('visible');
+            }, 1);
+        });
+        
+        const shakeStyle = document.createElement('style');
+        shakeStyle.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translate(0, 0); }
+                10% { transform: translate(-10px, 5px); }
+                20% { transform: translate(10px, -5px); }
+                30% { transform: translate(-10px, -5px); }
+                40% { transform: translate(10px, 5px); }
+                50% { transform: translate(-5px, 10px); }
+                60% { transform: translate(5px, -10px); }
+                70% { transform: translate(-10px, 5px); }
+                80% { transform: translate(10px, -5px); }
+                90% { transform: translate(-5px, -5px); }
+            }
+        `;
+        document.head.appendChild(shakeStyle);
+        
+        // ===== 3D FLAME ORB =====
+        const orbCanvas = document.getElementById('flame-orb');
+        const orbScene = new THREE.Scene();
+        const orbCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        const orbRenderer = new THREE.WebGLRenderer({ 
+            canvas: orbCanvas, 
+            alpha: true,
+            antialias: true
+        });
+        orbRenderer.setSize(300, 300);
+        orbRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        orbCamera.position.z = 3;
+        
+        const orbLayers = [];
+        const orbColors = [FLAME_COLORS.red, FLAME_COLORS.gold, 0xFF6B35];
+        
+        for (let i = 0; i < 3; i++) {
+            const geometry = new THREE.IcosahedronGeometry(1 - i * 0.2, 2);
+            const material = new THREE.MeshBasicMaterial({
+                color: orbColors[i] || FLAME_COLORS.gold,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.5 - i * 0.1
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            orbScene.add(mesh);
+            orbLayers.push(mesh);
+        }
+        
+        const innerGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const innerMaterial = new THREE.MeshBasicMaterial({
+            color: FLAME_COLORS.gold,
+            transparent: true,
+            opacity: 0.3
+        });
+        const innerGlow = new THREE.Mesh(innerGeometry, innerMaterial);
+        orbScene.add(innerGlow);
+        
+        const orbParticleCount = 100;
+        const orbParticleGeometry = new THREE.BufferGeometry();
+        const orbParticlePositions = new Float32Array(orbParticleCount * 3);
+        
+        for (let i = 0; i < orbParticleCount; i++) {
+            const i3 = i * 3;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            const radius = 1.5 + Math.random() * 0.5;
+            
+            orbParticlePositions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+            orbParticlePositions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+            orbParticlePositions[i3 + 2] = radius * Math.cos(phi);
+        }
+        
+        orbParticleGeometry.setAttribute('position', new THREE.BufferAttribute(orbParticlePositions, 3));
+        
+        const orbParticleMaterial = new THREE.PointsMaterial({
+            color: FLAME_COLORS.gold,
+            size: 0.05,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const orbParticles = new THREE.Points(orbParticleGeometry, orbParticleMaterial);
+        orbScene.add(orbParticles);
+        
+        function animateOrb() {
+            if (!introComplete) {
+                requestAnimationFrame(animateOrb);
+                return;
+            }
+            
+            orbLayers.forEach((layer, index) => {
+                layer.rotation.y += 0.005 * (index + 1);
+                layer.rotation.x += 0.003 * (index + 1);
+            });
+            
+            orbParticles.rotation.y -= 0.002;
+            
+            innerGlow.scale.setScalar(1 + Math.sin(Date.now() * 0.002) * 0.1);
+            
+            orbRenderer.render(orbScene, orbCamera);
+            requestAnimationFrame(animateOrb);
+        }
+        animateOrb();
+        
+        // ===== SCROLL ANIMATIONS =====
+        gsap.utils.toArray('.glass-card').forEach((card, index) => {
+            if (index === 0) return;
+            
+            ScrollTrigger.create({
+                trigger: card,
+                start: 'top 80%',
+                onEnter: () => card.classList.add('visible'),
+                once: true
+            });
+        });
+        
+        gsap.utils.toArray('.timeline-item').forEach((item, index) => {
+            ScrollTrigger.create({
+                trigger: item,
+                start: 'top 85%',
+                onEnter: () => {
+                    setTimeout(() => {
+                        item.classList.add('visible');
+                    }, index * 150);
+                },
+                once: true
+            });
+        });
+        
+        gsap.utils.toArray('.soul-stone').forEach((stone, index) => {
+            const color = stone.dataset.color;
+            stone.style.setProperty('--stone-color', color);
+            
+            gsap.to(stone, {
+                y: -10,
+                duration: 2 + index * 0.3,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+            
+            stone.addEventListener('click', () => {
+                const rect = stone.getBoundingClientRect();
+                createExplosion(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            });
+        });
+        
+        // ===== CONTACT FORM =====
+        const contactForm = document.getElementById('contact-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const successMessage = document.getElementById('success-message');
+        
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            submitBtn.classList.add('burning');
+            
+            gsap.to(contactForm, {
+                opacity: 0,
+                y: -30,
+                duration: 0.8,
+                delay: 0.5,
+                onComplete: () => {
+                    contactForm.style.display = 'none';
+                    successMessage.classList.add('visible');
+                }
+            });
+        });
+        
+        // ===== SMOOTH SCROLL FOR NAV LINKS =====
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        
+        // ===== HOBBIES SLIDER =====
+        const hobbiesSlider = document.querySelector('.hobbies-slider');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        
+        hobbiesSlider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - hobbiesSlider.offsetLeft;
+            scrollLeft = hobbiesSlider.scrollLeft;
+        });
+        
+        hobbiesSlider.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        
+        hobbiesSlider.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+        
+        hobbiesSlider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - hobbiesSlider.offsetLeft;
+            const walk = (x - startX) * 2;
+            hobbiesSlider.scrollLeft = scrollLeft - walk;
+        });
+        
+        hobbiesSlider.addEventListener('wheel', (e) => {
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                hobbiesSlider.scrollLeft += e.deltaY;
+            }
+        });
+    </script>
+</body>
+</html>
