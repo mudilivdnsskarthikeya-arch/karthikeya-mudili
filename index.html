@@ -371,10 +371,16 @@
         
         /* ===== GLASS CARD ===== */
         .glass-card {
-            background: rgba(10, 10, 10, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            /* DARKER GLASS for better reading */
+    background: rgba(5, 5, 10, 0.85); 
+    
+    /* Stronger Blur */
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+
+    /* GOLD BORDER for prestige */
+    border: 1px solid rgba(255, 215, 0, 0.3);
+            
             border-radius: 24px;
             padding: 48px;
             box-shadow: 
@@ -385,6 +391,14 @@
             opacity: 0;
             transform: translateY(50px);
         }
+       /* FORCE FINANCE FONT */
+h1, h2, h3, .glitch {
+    font-family: 'Courier New', monospace !important;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: bold;
+}
+        
         
         .glass-card.visible {
             opacity: 1;
@@ -1005,8 +1019,8 @@
         <!-- Hero Section -->
         <section class="section" id="home">
             <div class="glass-card hero-content">
-                <h1 class="hero-title">The Alchemist</h1>
-                <p class="hero-subtitle">Forged in Fire</p>
+                <h1 class="hero-title">VDNSS Karthikeya Mudili</h1>
+                <p class="hero-subtitle">Bridging GAAP Standards & Python Automation</p>
                 <p class="hero-tagline">Crafting digital experiences through the flames of creativity. Transforming ideas into immersive worlds.</p>
             </div>
         </section>
@@ -1018,10 +1032,8 @@
                     <div class="about-text-content">
                         <h2 class="about-title">Who Am I</h2>
                         <div class="about-text">
-                            <p>A creative developer and designer, forged in the fires of countless projects. Like an alchemist transmuting base metals into gold, I transform ideas into immersive digital experiences.</p>
-                            <p>My journey began with a spark of curiosity and has grown into an eternal flame of passion for creating beautiful, functional, and memorable web experiences.</p>
-                            <p>With expertise spanning frontend development, 3D graphics, and interactive design, I bring a unique perspective to every project—one that's been tempered by challenges and refined by experience.</p>
-                        </div>
+                            <p>I am a Chartered Accountancy student (CA Foundation Qualified) pivoting into Quantitative Finance. While others focus on manual compliance, I am building the tools to automate it. Currently preparing for CA Intermediate (May 2026).</p>
+                             </div>
                     </div>
                     <div class="orb-container">
                         <canvas id="flame-orb"></canvas>
@@ -1036,36 +1048,36 @@
                 <h2 class="skills-title">The Arsenal</h2>
                 <div class="skills-grid">
                     <div class="soul-stone" data-color="#FFD700">
-                        <span class="stone-icon">⚡</span>
-                        <span class="stone-name">JavaScript</span>
-                    </div>
-                    <div class="soul-stone" data-color="#0066FF">
-                        <span class="stone-icon">⚛️</span>
-                        <span class="stone-name">React</span>
-                    </div>
-                    <div class="soul-stone" data-color="#9D4EDD">
-                        <span class="stone-icon">🔷</span>
-                        <span class="stone-name">Three.js</span>
-                    </div>
-                    <div class="soul-stone" data-color="#00FF80">
-                        <span class="stone-icon">🎨</span>
-                        <span class="stone-name">CSS/Tailwind</span>
-                    </div>
-                    <div class="soul-stone" data-color="#FF0040">
-                        <span class="stone-icon">🟢</span>
-                        <span class="stone-name">Node.js</span>
+                        <span class="stone-icon">📚</span>
+                        <span class="stone-name">Advanced Accounting</span>
                     </div>
                     <div class="soul-stone" data-color="#0066FF">
                         <span class="stone-icon">🐍</span>
-                        <span class="stone-name">Python</span>
+                        <span class="stone-name">Python (Basics)</span>
                     </div>
                     <div class="soul-stone" data-color="#9D4EDD">
-                        <span class="stone-icon">🌐</span>
-                        <span class="stone-name">WebGL</span>
+                        <span class="stone-icon">⚖️</span>
+                        <span class="stone-name">Business & Corp Law</span>
+                    </div>
+                    <div class="soul-stone" data-color="#00FF80">
+                        <span class="stone-icon">🔍</span>
+                        <span class="stone-name">Auditing Basics</span>
+                    </div>
+                    <div class="soul-stone" data-color="#FF0040">
+                        <span class="stone-icon">💰</span>
+                        <span class="stone-name">Cost Management</span>
+                    </div>
+                    <div class="soul-stone" data-color="#0066FF">
+                        <span class="stone-icon">🕵️</span>
+                        <span class="stone-name">Corporate Research</span>
+                    </div>
+                    <div class="soul-stone" data-color="#9D4EDD">
+                        <span class="stone-icon">♟️</span>
+                        <span class="stone-name">Strategic Analysis</span>
                     </div>
                     <div class="soul-stone" data-color="#FFD700">
-                        <span class="stone-icon">✨</span>
-                        <span class="stone-name">UI/UX Design</span>
+                        <span class="stone-icon">🧠</span>
+                        <span class="stone-name">Critical Thinking</span>
                     </div>
                 </div>
             </div>
@@ -1077,29 +1089,33 @@
                 <h2 class="timeline-title">The Path</h2>
                 <div class="timeline">
                     <div class="timeline-item">
-                        <div class="timeline-date">2024</div>
-                        <div class="timeline-role">Senior Creative Developer</div>
-                        <div class="timeline-company">Flame Studios</div>
+                        <div class="timeline-date">2026</div>
+                        <div class="timeline-role">CA Intermediate Aspirant (May 2026)</div>
+                        <div class="timeline-company">Focus: Advanced Strategies & Financial Management</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-date">2022</div>
-                        <div class="timeline-role">Full Stack Developer</div>
-                        <div class="timeline-company">Ember Tech</div>
+                        <div class="timeline-date">Dec 2025 - Dec 2025</div>
+                        <div class="timeline-role">Academic Semester: BBA (Finance)</div>
+                        <div class="timeline-company">KK Modi University | CGPA: 8.03/10.0 (First Class Distinction)</div>
+                        <div class="timeline-company">Focus: Cost Accounting & Business Management </div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-date">2020</div>
-                        <div class="timeline-role">Frontend Developer</div>
-                        <div class="timeline-company">Spark Digital</div>
+                        <div class="timeline-date">June 2023</div>
+                        <div class="timeline-role">Professional Certification: CA Foundation</div>
+                        <div class="timeline-company">Institute of Chartered Accountants of India (ICAI)</div>
+                        <div class="timeline-company">Score: 247/400 (First Attempt) | Top 60th Percentile</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-date">2019</div>
-                        <div class="timeline-role">BS Computer Science</div>
-                        <div class="timeline-company">University of Fire</div>
+                        <div class="timeline-date">June 2021 - March 2023</div>
+                        <div class="timeline-role">Andhra Pradesh Intermediate(BIEAP) (HSC)</div>
+                        <div class="timeline-company">Class (11 + 12): State Board Topper (95.8%)</div>
+                        <div class="timeline-company">Pratibha Puraskar Awardee | Master Minds Institute</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-date">2018</div>
-                        <div class="timeline-role">Web Design Certification</div>
-                        <div class="timeline-company">Inferno Academy</div>
+                        <div class="timeline-date">March 2021</div>
+                        <div class="timeline-role">Indian Certificate of Secondary Education (ICSE Class 10)</div>
+                        <div class="timeline-company">ICSE Board | Score: 88.6%</div>
+                        <div class="timeline-company">Focus: Mathematics, English Literature & Computers</div>
                     </div>
                 </div>
             </div>
