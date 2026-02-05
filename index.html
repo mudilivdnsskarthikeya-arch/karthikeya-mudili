@@ -1274,9 +1274,9 @@ padding: 0 4px; /* Less padding */
                 <h2 class="hobbies-title">Passions</h2>
                 <div class="hobbies-slider">
                     <div class="hobby-card">
-                        <div class="hobby-icon">💻</div>
-                        <h3 class="hobby-name">Creative Coding</h3>
-                        <p class="hobby-desc">Blending logic with design. Building 3D web experiences using Three.js and Python to visualize data.</p>
+                         <div class="hobby-icon">🏛️</div>
+                        <h3 class="hobby-name">Corporate History</h3>
+                        <p class="hobby-desc">Studying the origins of legacy firms (like Keppel & Tata) to understand business longevity.</p>
                     </div>
                     <div class="hobby-card">
                         <div class="hobby-icon">📊</div>
@@ -1299,9 +1299,9 @@ padding: 0 4px; /* Less padding */
                         <p class="hobby-desc">Exploring fantasy and sci-fi realms, gathering inspiration from great storytellers.</p>
                     </div>
                     <div class="hobby-card">
-                        <div class="hobby-icon">🏛️</div>
-                        <h3 class="hobby-name">Corporate History</h3>
-                        <p class="hobby-desc">Studying the origins of legacy firms (like Keppel & Tata) to understand business longevity.</p>
+                       <div class="hobby-icon">💻</div>
+                        <h3 class="hobby-name">Creative Coding</h3>
+                        <p class="hobby-desc">Blending logic with design. Building 3D web experiences using Three.js and Python to visualize data.</p>
                     </div>
                 </div>
             </div>
@@ -1370,6 +1370,65 @@ padding: 0 4px; /* Less padding */
                     </div>
                 </div>
             </div>
+                <footer class="system-footer">
+    <div class="footer-line"></div>
+    <p>
+        <span style="color: #FFD700;">© 2026 VDNSS Karthikeya Mudili</span> 
+        <span class="separator">|</span> 
+        ALL RIGHTS RESERVED
+    </p>
+</footer>
+
+<style>
+    /* 1. THE CONTAINER (Glass & Space) */
+    .system-footer {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0;
+        margin-top: 50px;
+        position: relative;
+        z-index: 5;
+        background: linear-gradient(to top, #000 0%, transparent 100%);
+    }
+
+    /* 2. THE TEXT (Glowing & Sci-Fi) */
+    .system-footer p {
+        font-family: 'Orbitron', sans-serif; /* MATCHES YOUR MENU */
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.6);
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); /* FAINT GOLD GLOW */
+    }
+
+    .separator {
+        color: #FF6B35; /* MATCHES YOUR "GAP" COLOR */
+        margin: 0 10px;
+    }
+
+    /* 3. THE TECH LINE (The visual separator) */
+    .footer-line {
+        width: 150px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #FFD700, transparent);
+        margin: 0 auto 15px auto; /* Centered line above text */
+        opacity: 0.5;
+    }
+
+    /* 4. MOBILE ADJUSTMENT (Crucial for Android) */
+    @media (max-width: 480px) {
+        .system-footer {
+            /* Pushes the text UP so it sits ABOVE your floating menu */
+            padding-bottom: 80px; 
+            margin-top: 20px;
+        }
+        
+        .system-footer p {
+            font-size: 8px; /* Tiny & Clean */
+            letter-spacing: 1px;
+        }
+    }
+</style>
         </section>
     </main>
 
@@ -1623,64 +1682,6 @@ padding: 0 4px; /* Less padding */
             }
         });
     </script>
-    <footer class="system-footer">
-    <div class="footer-line"></div>
-    <p>
-        <span style="color: #FFD700;">© 2026 VDNSS Karthikeya Mudili</span> 
-        <span class="separator">|</span> 
-        ALL RIGHTS RESERVED
-    </p>
-</footer>
 
-<style>
-    /* 1. THE CONTAINER (Glass & Space) */
-    .system-footer {
-        width: 100%;
-        text-align: center;
-        padding: 20px 0;
-        margin-top: 50px;
-        position: relative;
-        z-index: 5;
-        background: linear-gradient(to top, #000 0%, transparent 100%);
-    }
-
-    /* 2. THE TEXT (Glowing & Sci-Fi) */
-    .system-footer p {
-        font-family: 'Orbitron', sans-serif; /* MATCHES YOUR MENU */
-        font-size: 10px;
-        color: rgba(255, 255, 255, 0.6);
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); /* FAINT GOLD GLOW */
-    }
-
-    .separator {
-        color: #FF6B35; /* MATCHES YOUR "GAP" COLOR */
-        margin: 0 10px;
-    }
-
-    /* 3. THE TECH LINE (The visual separator) */
-    .footer-line {
-        width: 150px;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #FFD700, transparent);
-        margin: 0 auto 15px auto; /* Centered line above text */
-        opacity: 0.5;
-    }
-
-    /* 4. MOBILE ADJUSTMENT (Crucial for Android) */
-    @media (max-width: 480px) {
-        .system-footer {
-            /* Pushes the text UP so it sits ABOVE your floating menu */
-            padding-bottom: 80px; 
-            margin-top: 20px;
-        }
-        
-        .system-footer p {
-            font-size: 8px; /* Tiny & Clean */
-            letter-spacing: 1px;
-        }
-    }
-</style>
 </body>
 </html>
